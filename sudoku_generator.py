@@ -22,8 +22,12 @@ class SudokuGenerator:
 	Return:
 	None
     '''
+
     def __init__(self, row_length, removed_cells):
-        pass
+        self.row_length = row_length  # - the length of each row
+        self.removed_cells = removed_cells  # - the total number of cells to be removed
+        self.box_length = int(math.sqrt(self.row_length))  # - the square root of row_length
+        self.board = [[0 for i in range(row_length)] for j in range(row_length)]  # - a 2D list of ints to represent the board
 
     '''
 	Returns a 2D python list of numbers which represents the board
@@ -32,7 +36,7 @@ class SudokuGenerator:
 	Return: list[list]
     '''
     def get_board(self):
-        pass
+        return self.board
 
     '''
 	Displays the board to the console
@@ -42,7 +46,13 @@ class SudokuGenerator:
 	Return: None
     '''
     def print_board(self):
-        pass
+        for i in range(len(self.board)):
+            for j in range(len(self.board[0])):
+                if j == 8:
+                    print(self.board[i][j])
+                else:
+                    print(str(self.board[i][j]), end=" ")
+        return None
 
     '''
 	Determines if num is contained in the specified row (horizontal) of the board
@@ -55,7 +65,10 @@ class SudokuGenerator:
 	Return: boolean
     '''
     def valid_in_row(self, row, num):
-        pass
+        for col in range(self.row_length):
+            if self.board[row][col] == num:
+                return False
+        return True
 
     '''
 	Determines if num is contained in the specified column (vertical) of the board
@@ -68,7 +81,10 @@ class SudokuGenerator:
 	Return: boolean
     '''
     def valid_in_col(self, col, num):
-        pass
+        for row in range(self.row_length):
+            if self.board[row][col] == num:
+                return False
+        return True
 
     '''
 	Determines if num is contained in the 3x3 box specified on the board
@@ -83,7 +99,11 @@ class SudokuGenerator:
 	Return: boolean
     '''
     def valid_in_box(self, row_start, col_start, num):
-        pass
+        for i in range(self.srn):
+            for j in range(self.srn):
+                if self.board[row_start + i][col_start + j] == num:
+                    return False
+        return True
     
     '''
     Determines if it is valid to enter num at (row, col) in the board
@@ -96,7 +116,7 @@ class SudokuGenerator:
 	Return: boolean
     '''
     def is_valid(self, row, col, num):
-        pass
+        return self.valid_in_row(row, num) and self.valid_in_col(col, num) and self.valid_in_box(row - row % self.box_length, col - col % self.box_length, num)
 
     '''
     Fills the specified 3x3 box with values
@@ -108,8 +128,19 @@ class SudokuGenerator:
 
 	Return: None
     '''
+
+    #Creates random whole integer to be used in fill_box function
+    def random_generator(self, num) -> int:
+        res = int(math.floor(random.random() * num + 1))
+        return res
+
     def fill_box(self, row_start, col_start):
-        pass
+        num = self.random_generator(self.row_length)
+        for i in range(self.srn):
+            for j in range(self.srn):
+                while not self.valid_in_box(row_start, col_start, num):
+                    num = self.random_generator(self.row_length)
+                self.board[row_start + i][col_start + j] = num
     
     '''
     Fills the three boxes along the main diagonal of the board
@@ -119,7 +150,8 @@ class SudokuGenerator:
 	Return: None
     '''
     def fill_diagonal(self):
-        pass
+        for i in range(0, self.row_length, self.box_length):
+            self.fill_box(i, i)
 
     '''
     DO NOT CHANGE
@@ -185,7 +217,14 @@ class SudokuGenerator:
 	Return: None
     '''
     def remove_cells(self):
-        pass
+        count = self.removed_cells
+        while count != 0:
+            cell_num = random.randint(0, self.row_length * self.row_length - 1)
+            row = cell_num // self.row_length
+            col = cell_num % self.row_length
+            if self.board[row][col] != 0:
+                count -= 1
+                self.board[row][col] = 0
 
 '''
 DO NOT CHANGE
