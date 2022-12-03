@@ -45,14 +45,14 @@ class SudokuGenerator:
 	Parameters: None
 	Return: None
     '''
-    def print_board(self):
+    def print_board(self) -> None:
         for i in range(len(self.board)):
             for j in range(len(self.board[0])):
                 if j == 8:
                     print(self.board[i][j])
                 else:
                     print(str(self.board[i][j]), end=" ")
-        return None
+
 
     '''
 	Determines if num is contained in the specified row (horizontal) of the board
@@ -99,8 +99,8 @@ class SudokuGenerator:
 	Return: boolean
     '''
     def valid_in_box(self, row_start, col_start, num):
-        for i in range(self.srn):
-            for j in range(self.srn):
+        for i in range(self.box_length):
+            for j in range(self.box_length):
                 if self.board[row_start + i][col_start + j] == num:
                     return False
         return True
@@ -130,14 +130,14 @@ class SudokuGenerator:
     '''
 
     #Creates random whole integer to be used in fill_box function
-    def random_generator(self, num) -> int:
+    def random_generator(self, num):
         res = int(math.floor(random.random() * num + 1))
         return res
 
     def fill_box(self, row_start, col_start):
         num = self.random_generator(self.row_length)
-        for i in range(self.srn):
-            for j in range(self.srn):
+        for i in range(self.box_length):
+            for j in range(self.box_length):
                 while not self.valid_in_box(row_start, col_start, num):
                     num = self.random_generator(self.row_length)
                 self.board[row_start + i][col_start + j] = num
@@ -248,3 +248,4 @@ def generate_sudoku(size, removed):
     sudoku.remove_cells()
     board = sudoku.get_board()
     return board
+
