@@ -24,7 +24,7 @@ class Cell:
         self.sketch = value
 
     def draw(self, window):
-        font = pg.font.Font("resources/OpenSans-Regular.ttf", 26)
+        font = pg.font.SysFont('comicsans', 36)
         space = self.width / 9
 
         # Calculate drawing position relative to this box in board
