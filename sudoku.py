@@ -180,7 +180,7 @@ def game_on(screen, reset_button, exit_button, restart_button, backgroung_img):
         for event in pygame.event.get():
             # If the exit button gets pressed
             if event.type == pygame.QUIT:
-                playing = False
+                run = False
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -189,8 +189,24 @@ def game_on(screen, reset_button, exit_button, restart_button, backgroung_img):
                 if clicked:
                     board.select(clicked[0], clicked[1])
             if event.type == pygame.KEYDOWN:
-                if event.key in ALLOWED_INPUTS:
-                    number = int(chr(event.key))
+                if event.key == pygame.K_1:
+                    key = 1
+                elif event.key == pygame.K_2:
+                    key = 2
+                elif event.key == pygame.K_3:
+                    key = 3
+                elif event.key == pygame.K_4:
+                    key = 4
+                elif event.key == pygame.K_5:
+                    key = 5
+                elif event.key == pygame.K_6:
+                    key = 6
+                elif event.key == pygame.K_7:
+                    key = 7
+                elif event.key == pygame.K_8:
+                    key = 8
+                elif event.key == pygame.K_9:
+                    key = 9
                 elif event.key == pygame.K_LEFT:
                     row, col = board.selected
                     if col > 0:
@@ -221,7 +237,7 @@ def game_on(screen, reset_button, exit_button, restart_button, backgroung_img):
                     if select:
                         row, col = select
                         if board.cells[row][col].sketch != 0:
-                            if board.place(board.cells[row][col].sketch):
+                            if board.place_number(board.cells[row][col].sketch):
                                 print("Success!")
                             else:
                                 print("Wrong")

@@ -84,7 +84,7 @@ class Board:
         #Sets the sketched value of the current selected cell equal to user entered value.
         #It will be displayed at the top left corner of the cell using the draw() function.
         row, col = self.selected
-        self.cells[row][col].set_temp(value)
+        self.cells[row][col].set_sketched_value(value)
 
     def place_number(self, value):
         #Sets the value of the current selected cell equal to user entered value.
@@ -92,14 +92,14 @@ class Board:
         row, col = self.selected
 
         if self.cells[row][col].value == 0:
-            self.cells[row][col].set(value)
+            self.cells[row][col].set_cell_value(value)
             self.update_board()
 
-            if self.check_board(self.board, value, (row, col)) and self.solve():
+            if self.check_board(self.board, value, (row, col)):
                 return True
             else:
-                self.cells[row][col].set(0)
-                self.cells[row][col].set_temp(0)
+                self.cells[row][col].set_cell_value(0)
+                self.cells[row][col].set_sketched_value(0)
                 self.update_board()
                 return False
 
@@ -109,7 +109,7 @@ class Board:
             for j in range(self.cols):
                 self.board[i][j] = self.board_reset[i][j]
 
-        self.cells = [[Cell(self.board[i][j], i, j, screen)
+        self.cells = [[Cell(self.board[i][j], i, j, self.width, self.height)
                        for j in range(self.cols)] for i in range(self.rows)]
 
     def is_full(self):
@@ -134,23 +134,28 @@ class Board:
 
         return False
 
-    def check_board():
-        #Check whether the Sudoku board is solved correctly.
-        #https://python.plainenglish.io/solve-a-sudoku-puzzle-using-backtracking-in-python-8e9eb58e57e6
-        find = self.find_empty()
-        if not find:
-            return True
-        else:
-            row, col = find
+    def check_board(self, bo, num, pos):
+        #https://www.techwithtim.net/tutorials/python-programming/sudoku-solver-backtracking/
+        # Check row
+        for i in range(len(bo[0])):
+            if bo[pos[0]][i] == num and pos[1] != i:
+                return False
 
-        for i in range(1, 10):
-            if self.valid(self.model, i, (row, col)):
-                self.model[row][col] = i
+        # Check column
+        for i in range(len(bo)):
+            if bo[i][pos[1]] == num and pos[0] != i:
+                return False
 
-                if self.solve():
-                    return True
-                self.model[row][col] = 0
-        return False
+        # Check box
+        box_x = pos[1] // 3
+        box_y = pos[0] // 3
+
+        for i in range(box_y * 3, box_y * 3 + 3):
+            for j in range(box_x * 3, box_x * 3 + 3):
+                if bo[i][j] == num and (i, j) != pos:
+                    return False
+
+        return True
 
 
 
