@@ -23,8 +23,8 @@ class Cell:
     def set_sketched_value(self, value):
         self.sketch = value
 
-    def draw(self, window):
-        font = pg.font.SysFont('comicsans', 36)
+    def draw(self, screen):
+        font = pg.font.SysFont('arial', 36)
         space = self.width / 9
 
         # Calculate drawing position relative to this box in board
@@ -33,13 +33,13 @@ class Cell:
 
         if self.temp != 0 and self.value == 0:
             text = font.render(str(self.temp), 1, self.COLOR_GRAY)
-            window.blit(text, (x + 3, y + 3))  # Draw small number in upper-left corner
+            screen.blit(text, (x + 3, y + 3))  # Draw small number in upper-left corner
         elif self.value != 0:
             text = font.render(str(self.value), 1, self.COLOR_WHITE)
-            window.blit(text, (x + (space/2 - text.get_width()/2), y + (space/2 - text.get_height()/2)))  # Draw number in the middle
+            screen.blit(text, (x + (space / 2 - text.get_width() / 2), y + (space / 2 - text.get_height() / 2)))  # Draw number in the middle
 
         if self.selected:
-            pg.draw.rect(window, self.COLOR_RED, (x, y, space, space), 3)  # If this box selected, draw red box./
+            pg.draw.rect(screen, self.COLOR_RED, (x, y, space, space), 3)  # If this box selected, draw red box./
 
     def set_temp(self, val):
         self.temp = val
