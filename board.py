@@ -1,4 +1,6 @@
-
+import pygame
+from cell import Cell
+from sudoku_generator import generate_sudoku
 #This class represents an entire Sudoku board. A Board object has 81 Cell objects.
 class Board:
 

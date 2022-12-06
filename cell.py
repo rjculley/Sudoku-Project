@@ -1,4 +1,4 @@
-
+import pygame
 
 class Cell:
     #consturctor to make the board 9x9
