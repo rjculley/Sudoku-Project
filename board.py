@@ -28,14 +28,19 @@ class Board:
         # Draws an outline of the Sudoku grid, with bold lines to delineate the 3x3 boxes.
         # Draws every cell on this board.
         # https://stackoverflow.com/questions/73587924/creating-a-bold-line-in-pygame
-        window.fill((255, 255, 255))
-        for i in range(10):
-            w = 3 if i == 3 or i == 6 else 1
-            pygame.draw.line(window, (0, 0, 0), (50, 50 + i * 30), (320, 50 + i * 30), w)
-            pygame.draw.line(window, (0, 0, 0), (50 + i * 30, 50), (50 + i * 30, 320), w)
-        pygame.display.flip()
+        gap = self.width / 9
+        for i in range(self.rows + 1):
+            if i % 3 == 0 and i != 0:
+                thick = 4
+            else:
+                thick = 1
+            pygame.draw.line(self.screen, (0, 0, 0), (0, i * gap),
+                             (self.width, i * gap), thick)
+            pygame.draw.line(self.screen, (0, 0, 0), (i * gap, 0),
+                             (i * gap, self.height), thick)
 
         # draw cell and text in cells
+        # v2
         for i in range(self.rows):
             for j in range(self.cols):
                 self.cells[i][j].draw(self.screen)
@@ -54,7 +59,7 @@ class Board:
         self.selected = (row, col)
 
 
-    def click(self, x, y):
+    def click(self, pos):
         #If a tuple of (x, y) coordinates is within the displayed board, this function returns a tuple of the (row, col)
         # of the cell which was clicked. Otherwise, this function returns None.
         if pos[0] < self.width and pos[1] < self.height:
@@ -104,7 +109,7 @@ class Board:
             for j in range(self.cols):
                 self.board[i][j] = self.board_reset[i][j]
 
-        self.cells = [[Cell(self.board[i][j], i, j, self.width, self.height)
+        self.cells = [[Cell(self.board[i][j], i, j, screen)
                        for j in range(self.cols)] for i in range(self.rows)]
 
     def is_full(self):

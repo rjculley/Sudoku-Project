@@ -2,6 +2,7 @@ import pygame
 import sys
 from board import Board
 import button
+import time
 
 
 # Initialize pygame
@@ -62,15 +63,18 @@ def start_screen(screen, easy_button, medium_button, hard_button, background_img
     global menu_state
 
     #set font for menu text
-    font = pygame.font.SysFont("arial", 75)
-    text = font.render("Let's play Sudoku!", 1, (0, 0, 0))
-    text2 = font.render("Select Game difficulty:", 1, (0, 0, 0))
+    font = pygame.font.Font(None, 75)
+    font2 = pygame.font.Font(None, 60)
+    text = font.render("Welcome to Sudoku", 1, (255, 255, 255))
+    text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, 110))
+    text2 = font2.render("Select Game Mode:", 1, (255, 255, 255))
+    text2_rect = text2.get_rect(center=(SCREEN_WIDTH // 2, 200))
 
     #set background image for this screen
     screen.blit(background_img, (0, 0))
 
-    screen.blit(text, (25, 100))
-    screen.blit(text2, (70, 275))
+    screen.blit(text, text_rect)
+    screen.blit(text2, text2_rect)
     pygame.display.update()
     #wait 500 milliseconds
     pygame.time.wait(500)
@@ -103,7 +107,7 @@ def start_screen(screen, easy_button, medium_button, hard_button, background_img
         pygame.display.update()
 
 
-def game_over_screen(screen, restart_button_2, background_img):
+def game_over_screen(screen, restart_button, background_img):
     global menu_state
     #set font for screen text
     font = pygame.font.SysFont("arial", 100)
@@ -159,13 +163,16 @@ def terminate(): # method to terminate game
     pygame.quit()
     sys.exit()
 
-def game_on(screen, reset_button, exit_button, restart_button, background_img):
+def game_on(screen, reset_button, exit_button, restart_button, backgroung_img):
     global menu_state
-    board = Board(9, 9, 540, 540, screen, difficulty)
+    board = Board(9, 9, SCREEN_WIDTH, SCREEN_HEIGHT, screen, difficulty)
     playing = True
     key = None
     start = time.time()
     strikes = 0
+    # Set containing the allowed inputs
+    ALLOWED_INPUTS = {pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4,
+                      pygame.K_5, pygame.K_6, pygame.K_7, pygame.K_8, pygame.K_9}
     while playing:
         play_time = round(time.time() - start)
 
@@ -182,26 +189,9 @@ def game_on(screen, reset_button, exit_button, restart_button, background_img):
                 if clicked:
                     board.select(clicked[0], clicked[1])
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_1:
-                    key = 1
-                elif event.key == pygame.K_2:
-                    key = 2
-                elif event.key == pygame.K_3:
-                    key = 3
-                elif event.key == pygame.K_4:
-                    key = 4
-                elif event.key == pygame.K_5:
-                    key = 5
-                elif event.key == pygame.K_6:
-                    key = 6
-                elif event.key == pygame.K_7:
-                    key = 7
-                elif event.key == pygame.K_8:
-                    key = 8
-                elif event.key == pygame.K_9:
-                    key = 9
-
-                if event.key == pygame.K_LEFT:
+                if event.key in ALLOWED_INPUTS:
+                    number = int(chr(event.key))
+                elif event.key == pygame.K_LEFT:
                     row, col = board.selected
                     if col > 0:
                         col -= 1
@@ -230,15 +220,15 @@ def game_on(screen, reset_button, exit_button, restart_button, background_img):
                     select = board.selected
                     if select:
                         row, col = select
-                        if board.cells[row][col].temp != 0:
-                            if board.place(board.cells[row][col].temp):
+                        if board.cells[row][col].sketch != 0:
+                            if board.place(board.cells[row][col].sketch):
                                 print("Success!")
                             else:
                                 print("Wrong")
                                 strikes += 1
                             key = None
 
-                            if board.is_finished():
+                            if board.is_full():
                                 screen = "won"
                                 print("Game Over! YOU WON!")
                                 return
@@ -253,12 +243,12 @@ def game_on(screen, reset_button, exit_button, restart_button, background_img):
                 pygame.display.update()
                 return
 
-        if board.selected and key:
+        if board.selected and key != None:
             board.sketch(key)
-            key = None
 
-        redraw_window(screen, board, play_time, strikes,
-                      restart_button_2, background_img)
+        redraw_window(screen, board, play_time, strikes)
+        pygame.display.update()
+
         # If menu state is reset to start screen
         if menu_state == "start":
             return
@@ -275,6 +265,24 @@ def game_on(screen, reset_button, exit_button, restart_button, background_img):
             pygame.quit()
             sys.exit()
         pygame.display.update()
+def format_time(secs):
+    sec = secs % 60
+    minute = secs // 60
+    hour = minute // 60
+
+    mat = " " + str(minute) + ":" + str(sec)
+    return mat
+def redraw_window(screen, board, time, strikes):
+    screen.fill((255, 255, 255))
+    # Draw time
+    fnt = pygame.font.SysFont("arial", 40)
+    text = fnt.render("Time: " + format_time(time), 1, (0, 0, 0))
+    screen.blit(text, (540 - 160, 560))
+    # Draw Strikes
+    text = fnt.render("X " * strikes, 1, (255, 0, 0))
+    screen.blit(text, (20, 560))
+    # Draw grid and board
+    board.draw()
 
 
 def main(): # source - https://github.com/russs123/pygame_tutorials/blob/main/Menu/main.py
@@ -301,9 +309,9 @@ def main(): # source - https://github.com/russs123/pygame_tutorials/blob/main/Me
     background_img = pygame.transform.scale(background_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
     # create button instances
-    easy_button = button.Button(304, 125, easy_img, 1)
-    medium_button = button.Button(297, 250, medium_img, 1)
-    hard_button = button.Button(336, 375, hard_img, 1)
+    easy_button = button.Button(250, 275, easy_img, 1)
+    medium_button = button.Button(250, 350, medium_img, 1)
+    hard_button = button.Button(250, 425, hard_img, 1)
     exit_button = button.Button(226, 75, exit_img, 1)
     restart_button = button.Button(225, 200, restart_img, 1)
     reset_button = button.Button(246, 325, reset_img, 1)
@@ -315,12 +323,12 @@ def main(): # source - https://github.com/russs123/pygame_tutorials/blob/main/Me
         game_on(screen, reset_button, exit_button, restart_button, background_img)
         # This is for when the user clicks 'reset' from the board screen
         if (menu_state == "start"):
-            showStartScreen(screen, easy_button, medium_button,
+            start_screen(screen, easy_button, medium_button,
                             hard_button, background_img)
         elif (menu_state == "won"):
-            showGameWonScreen(screen, exit_button, background_img)
+            game_won_screen(screen, exit_button, background_img)
         else:
-            showGameOverScreen(screen, restart_button, background_img)
+            game_over_screen(screen, restart_button, background_img)
 
 
 main()
